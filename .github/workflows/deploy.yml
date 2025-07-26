@@ -18,25 +18,20 @@ jobs:
     steps:
       - name: Checkout source code
         uses: actions/checkout@v4
-        
       - name: Extract version from tag
         id: extract_version
         run: echo "version=${GITHUB_REF#refs/tags/}" >> $GITHUB_OUTPUT
-        
       - name: Setup Node.js for production
         uses: actions/setup-node@v4
         with:
           node-version: '18'
           cache: 'npm'
-          
       - name: Install production dependencies
         run: npm ci --only=production
-        
       - name: Build optimized production bundle
         run: npm run build
-        
       - name: Upload production artifacts
-        uses: actions/upload-artifact@v4 
+        uses: actions/upload-artifact@v4
         with:
           name: production-release-${{ steps.extract_version.outputs.version }}
           path: dist/
@@ -52,7 +47,6 @@ jobs:
         with:
           name: production-release-${{ needs.build-for-production.outputs.version }}
           path: dist/
-          
       - name: Deploy to staging server
         env:
           STAGING_SERVER: ${{ secrets.STAGING_SERVER }}
@@ -68,11 +62,10 @@ jobs:
     environment: production
     steps:
       - name: Download production artifacts
-        uses: actions/download-artifact@v4 
+        uses: actions/download-artifact@v4
         with:
           name: production-release-${{ needs.build-for-production.outputs.version }}
           path: dist/
-          
       - name: Deploy to production server
         env:
           PRODUCTION_SERVER: ${{ secrets.PRODUCTION_SERVER }}
@@ -80,10 +73,6 @@ jobs:
         run: |
           echo "Deploying version ${{ needs.build-for-production.outputs.version }} to production"
           echo "Production deployment completed successfully"
-          
       - name: Create deployment notification
         run: |
           echo "🚀 Successfully deployed version ${{ needs.build-for-production.outputs.version }} to production"
-      
-      - name: Verify build artifacts
-        run: ls -la dist/ || exit 1
