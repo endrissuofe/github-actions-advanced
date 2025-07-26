@@ -1,0 +1,21 @@
+{
+  "name": "github-actions-advanced-course",
+  "version": "1.0.0",
+  "description": "Advanced GitHub Actions concepts demonstration",
+  "main": "src/app.js",
+  "scripts": {
+    "start": "node src/app.js",
+    "test": "jest --coverage",
+    "lint": "eslint src/ tests/",
+    "lint:fix": "eslint src/ tests/ --fix",
+    "build": "mkdir -p dist && cp -r src/* dist/"
+  },
+  "dependencies": {
+    "express": "^4.18.2"
+  },
+  "devDependencies": {
+    "jest": "^29.0.0",
+    "supertest": "^6.3.0",
+    "eslint": "^8.45.0"
+  }
+}
