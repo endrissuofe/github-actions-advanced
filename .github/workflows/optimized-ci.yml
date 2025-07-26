@@ -24,7 +24,7 @@ jobs:
         
       - name: Cache Node.js dependencies
         id: cache-deps
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: |
             ~/.npm
@@ -77,7 +77,7 @@ jobs:
         uses: actions/checkout@v4
         
       - name: Restore dependency cache
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: |
             ~/.npm
@@ -115,7 +115,7 @@ jobs:
         uses: actions/checkout@v4
         
       - name: Restore dependency cache
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: |
             ~/.npm
@@ -123,7 +123,7 @@ jobs:
           key: ${{ needs.dependency-management.outputs.cache-key }}
           
       - name: Cache build outputs
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: |
             dist/
