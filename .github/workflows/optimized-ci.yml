@@ -139,7 +139,8 @@ jobs:
           
       - name: Install dependencies
         run: npm ci
-          
+        if: steps.cache-deps.outputs.cache-hit != 'true' || steps.restore-cache.outputs.cache-hit
+
       - name: Build application with optimization
         run: |
           echo "Building with cache optimization..."

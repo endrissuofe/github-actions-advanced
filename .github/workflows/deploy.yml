@@ -36,7 +36,7 @@ jobs:
         run: npm run build
         
       - name: Upload production artifacts
-        uses: actions/upload-artifact@v4  # Updated to v4
+        uses: actions/upload-artifact@v4 
         with:
           name: production-release-${{ steps.extract_version.outputs.version }}
           path: dist/
@@ -48,7 +48,7 @@ jobs:
     environment: staging
     steps:
       - name: Download production artifacts
-        uses: actions/download-artifact@v4  # Updated to v4
+        uses: actions/download-artifact@v4
         with:
           name: production-release-${{ needs.build-for-production.outputs.version }}
           path: dist/
@@ -68,7 +68,7 @@ jobs:
     environment: production
     steps:
       - name: Download production artifacts
-        uses: actions/download-artifact@v4  # Updated to v4
+        uses: actions/download-artifact@v4 
         with:
           name: production-release-${{ needs.build-for-production.outputs.version }}
           path: dist/
@@ -84,3 +84,6 @@ jobs:
       - name: Create deployment notification
         run: |
           echo "🚀 Successfully deployed version ${{ needs.build-for-production.outputs.version }} to production"
+      
+      - name: Verify build artifacts
+        run: ls -la dist/ || exit 1
