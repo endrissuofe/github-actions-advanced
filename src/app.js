@@ -23,6 +23,11 @@ app.get('/health', (req, res) => {
   });
 });
 
+// Custom 404 handler
+app.use((req, res) => {
+  res.status(404).json({ error: 'Not Found' });
+});
+
 // Error handling
 app.use((err, req, res) => {
   res.status(500).json({ error: 'Internal Server Error' });
@@ -31,7 +36,8 @@ app.use((err, req, res) => {
 // Start server only if this file is run directly
 if (require.main === module) {
   app.listen(port, () => {
- });
+    // Removed console.log to avoid ESLint no-console warning
+  });
 }
 
 module.exports = app;
