@@ -1,18 +1,15 @@
 name: Build and Test Node.js Application
 
-# Clear trigger configuration with comments
 on:
   push:
     branches: [ main, develop ]
   pull_request:
     branches: [ main ]
 
-# Environment variables for consistency
 env:
   NODE_VERSION: '18'
   
 jobs:
-  # Job 1: Code Quality and Linting
   code-quality:
     name: Code Quality Assessment
     runs-on: ubuntu-latest
@@ -26,29 +23,26 @@ jobs:
           node-version: ${{ env.NODE_VERSION }}
           cache: 'npm'
           
-      # This step was missing in the original guide!
       - name: Install project dependencies
         run: npm ci
         
-      # ESLint helps maintain code consistency and catch potential bugs
       - name: Run ESLint code analysis
         run: npm run lint
         
       - name: Upload ESLint results
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4  # Updated to v4
         if: always()
         with:
           name: eslint-results
           path: eslint-report.json
 
-  # Job 2: Comprehensive Testing
   testing:
     name: Unit and Integration Tests
     runs-on: ubuntu-latest
-    needs: code-quality # Ensure code quality before testing
+    needs: code-quality
     strategy:
       matrix:
-        node-version: [16, 18, 20] # Test across multiple Node versions
+        node-version: [16, 18, 20]
     steps:
       - name: Checkout source code
         uses: actions/checkout@v4
@@ -59,18 +53,15 @@ jobs:
           node-version: ${{ matrix.node-version }}
           cache: 'npm'
           
-      # Critical step - install dependencies
       - name: Install dependencies
         run: npm ci
         
-      # Run tests with coverage reporting
       - name: Execute test suite with coverage
         run: npm test
         
       - name: Generate test coverage report
         run: npm run test -- --coverage --coverageReporters=lcov
         
-      # Upload coverage for analysis and reporting
       - name: Upload coverage reports
         uses: codecov/codecov-action@v3
         with:
@@ -78,7 +69,6 @@ jobs:
           flags: unittests
           name: node-${{ matrix.node-version }}
 
-  # Job 3: Build Application Artifacts
   build-application:
     name: Build Production Bundle
     runs-on: ubuntu-latest
@@ -93,17 +83,14 @@ jobs:
           node-version: ${{ env.NODE_VERSION }}
           cache: 'npm'
           
-      # Install dependencies before building
       - name: Install dependencies
         run: npm ci
         
-      # Build the application for production
       - name: Build production artifacts
         run: npm run build
         
-      # Store build artifacts for deployment pipeline
       - name: Upload build artifacts
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4  # Updated to v4
         with:
           name: production-build-${{ github.sha }}
           path: dist/

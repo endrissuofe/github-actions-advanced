@@ -7,7 +7,6 @@ on:
     branches: [ main ]
 
 jobs:
-  # Parallel Job 1: Dependency Management and Caching
   dependency-management:
     name: Dependency Caching and Installation
     runs-on: ubuntu-latest
@@ -18,13 +17,11 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
         
-      # Generate cache key based on package files
       - name: Generate cache key
         id: cache-key
         run: |
           echo "key=deps-${{ runner.os }}-${{ hashFiles('**/package-lock.json', '**/package.json') }}" >> $GITHUB_OUTPUT
         
-      # Advanced caching with multiple restore keys
       - name: Cache Node.js dependencies
         id: cache-deps
         uses: actions/cache@v3
@@ -44,7 +41,6 @@ jobs:
           node-version: '18'
           cache: 'npm'
           
-      # Conditional installation based on cache hit
       - name: Install dependencies (cache miss)
         if: steps.cache-deps.outputs.cache-hit != 'true'
         run: |
@@ -57,23 +53,20 @@ jobs:
           echo "Cache hit - verifying dependencies"
           npm ls --depth=0
 
-  # Parallel Job 2: Multi-Environment Testing Matrix
   test-matrix:
     name: Cross-Platform Testing
     runs-on: ${{ matrix.os }}
     needs: dependency-management
     strategy:
-      fail-fast: false # Don't cancel other jobs if one fails
+      fail-fast: false
       matrix:
         os: [ubuntu-latest, windows-latest, macos-latest]
         node-version: [16, 18, 20]
-        # Optimize matrix by excluding resource-intensive combinations
         exclude:
           - os: windows-latest
             node-version: 16
           - os: macos-latest
             node-version: 16
-        # Include specific combinations for edge case testing
         include:
           - os: ubuntu-latest
             node-version: 21
@@ -83,7 +76,6 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
         
-      # Use the same cache key pattern for consistency
       - name: Restore dependency cache
         uses: actions/cache@v3
         with:
@@ -101,22 +93,19 @@ jobs:
           node-version: ${{ matrix.node-version }}
           cache: 'npm'
           
-      # Always install dependencies (may use cache)
       - name: Install dependencies
         run: npm ci
         
       - name: Run test suite
         run: npm test
         
-      # Upload test results for aggregation
       - name: Upload test results
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4  # Updated to v4
         if: always()
         with:
           name: test-results-${{ matrix.os }}-${{ matrix.node-version }}
           path: coverage/
 
-  # Parallel Job 3: Build Optimization
   optimized-build:
     name: Optimized Build Process
     runs-on: ubuntu-latest
@@ -125,7 +114,6 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
         
-      # Restore cached dependencies
       - name: Restore dependency cache
         uses: actions/cache@v3
         with:
@@ -134,7 +122,6 @@ jobs:
             node_modules
           key: ${{ needs.dependency-management.outputs.cache-key }}
           
-      # Cache build outputs for reuse
       - name: Cache build outputs
         uses: actions/cache@v3
         with:
@@ -150,7 +137,6 @@ jobs:
         with:
           node-version: '18'
           
-      # Install if not cached
       - name: Install dependencies
         run: npm ci
           
@@ -165,7 +151,6 @@ jobs:
           echo "Cache hit: ${{ needs.dependency-management.outputs.cache-hit }}"
           du -sh dist/ || echo "Build directory size calculation failed"
 
-  # Performance Monitoring and Reporting
   performance-analysis:
     name: Performance Analysis and Reporting
     runs-on: ubuntu-latest
@@ -183,7 +168,7 @@ jobs:
           echo "- **Report Generated**: $(date)" >> performance-report.md
           
       - name: Upload performance report
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4  # Updated to v4
         with:
           name: performance-analysis
           path: performance-report.md
